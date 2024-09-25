@@ -2,10 +2,16 @@ const express=require('express');
 const app=express();
 const mongoose=require('mongoose');
 const Listing=require('./models/listing.js');
-const path=require('path')
+const path=require('path');
 const methodOverride=require('method-override');
 const ejsMate=require('ejs-mate');
 const wrapAsync=require('./utils/wrapAsync.js');
+const ExpressError=require('./utils/ExpressError.js');
+const {listingSchema}=require('./schema.js');
+const Review=require("./models/reviews.js");
+
+
+
 
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'/views'));
@@ -22,14 +28,31 @@ async function main() {
 }
 
 app.get("/",(req,res)=>{
-    res.send("Welcome");
+    res.send("Welcome to HomePage");
 });
 
+
+const validateListing=(req,res,next)=>{
+    let {error}=listingSchema.validate(req.body);
+    if(error){
+        let errMsg=error.details.map((el)=>el.message).join(",");
+        throw new ExpressError(400,errMsg);
+    }else{
+    next();
+    }
+}
+
+
+
+
+
+
+
 //index Route
-app.get("/listings",async(req,res)=>{
+app.get("/listings",wrapAsync(async(req,res)=>{
     const allListings=await Listing.find({});
     res.render("listings/index.ejs",{allListings});
-});
+}));
 
 //New Listing route
 app.get("/listings/new",(req,res)=>{
@@ -37,14 +60,14 @@ app.get("/listings/new",(req,res)=>{
 });
 
 //Show Route
-app.get("/listings/:id",async (req,res)=>{
+app.get("/listings/:id",wrapAsync(async (req,res)=>{
     let {id}=req.params;
     const listing=await Listing.findById(id);
     res.render("listings/show.ejs",{listing});
-});
+}));
 
 //Create New Listing
-app.post("/listings",wrapAsync(async(req,res,next)=>{
+app.post("/listings",validateListing,wrapAsync(async(req,res,next)=>{
     // let {title,description,image,price,country,location}=req.body;
     // let listing=req.body.listing;
         const newListing=new Listing(req.body.listing);
@@ -60,16 +83,29 @@ app.get("/listings/:id/edit",wrapAsync(async(req,res)=>{
 }));
 
 //Update Route
-app.put("/listings/:id",async(req,res)=>{
+app.put("/listings/:id",validateListing,wrapAsync(async(req,res)=>{
     let {id}=req.params;
     await Listing.findByIdAndUpdate(id,{...req.body.listing});
     res.redirect(`/listings/${id}`);
-});
+}));
 
-app.delete("/listings/:id",async(req,res)=>{
+//Delete Route
+app.delete("/listings/:id",wrapAsync(async(req,res)=>{
     let {id}=req.params;
     await Listing.findByIdAndDelete(id);
     res.redirect("/listings");
+}));
+
+//Review
+//Post Route
+app.post("/listings/:id/reviews",async(req,res)=>{
+    let listing=await Listing.findById(req.params.id);
+    let newReview=new Review(req.body.review);
+    listing.reviews.push(newReview);
+
+    await newReview.save();
+    await listing.save();
+    res.redirect(`/listings/${listings._id}`);
 });
 
 
@@ -81,15 +117,24 @@ app.delete("/listings/:id",async(req,res)=>{
 
 
 
+
+
+
+
+
+app.all("/*",(req,res,next)=>{
+    next(new ExpressError(400,"Page Not Found!"));
+});
 
 
 
 app.use((err,req,res,next)=>{
-    res.send("something went wrong");
+    let {statusCode=500,message="Something went wrong!"}=err;
+    res.status(statusCode).render("error.ejs",{message});
+    // res.status(statusCode).send(message);
 });
 
 
-
 app.listen(8080,()=>{
-    console.log("Server is Listening to port 8080");
+    console.log(`http://localhost:8080/listings${8080}`);
 });
