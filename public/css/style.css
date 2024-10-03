@@ -1,4 +1,4 @@
-.body{
+body{
     font-family: "Plus Jakarta Sans",sans-serif !important;
     display: flex;
     flex-direction: column;
@@ -48,7 +48,7 @@
 }
 
 /* listings */
-.card{
+.listing-card{
     border: none !important;
     margin-bottom: 2rem;
 
@@ -84,6 +84,7 @@
 .add-btn{
     background-color: #fe424d !important;
     border: none !important;
+    width: 70px;
 }
 
 /* Edit */
