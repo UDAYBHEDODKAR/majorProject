@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const methodOverride = require('method-override');
 const ejsMate = require('ejs-mate');
+
 const ExpressError = require('./utils/ExpressError.js');
 const session =require("express-session");
 const flash =require('connect-flash');
@@ -22,6 +23,7 @@ const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 main().then(() => {
     console.log("Connected to DB");
 }).catch((err) => { console.log(err); });
+
 async function main() {
     await mongoose.connect(MONGO_URL);
 }
@@ -67,6 +69,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req,res,next)=>{
     res.locals.success=req.flash("success");
     res.locals.error=req.flash("error");
+    res.locals.currUser=req.user;
     next();
 });
 
