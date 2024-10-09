@@ -4,6 +4,8 @@ body{
     flex-direction: column;
     min-height: 100vh;
 }
+
+
 .container{
     flex: 1;
 }
@@ -51,7 +53,7 @@ body{
 .listing-card{
     border: none !important;
     margin-bottom: 2rem;
-
+    background: transparent !important;
 }
 .card-img-top{
     border-radius: 1rem !important;
@@ -61,6 +63,7 @@ body{
 }
 .card-body{
     padding: 0 !important;
+    /* color: white !important; */
 
 }
 .card-text p {
@@ -108,5 +111,10 @@ body{
     padding-left: 0;
     padding-right: 0;
 }
+
+
+
+
+
 
 

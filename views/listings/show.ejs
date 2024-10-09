@@ -7,7 +7,7 @@
             </h3>
         </div>
         <div class="card col-6 offset-3 show-card listing-card">
-            <img src="<%=listing.image%>" class="card-img-top show-img" alt="listing_image">
+            <img src="<%=listing.image.url%>" class="card-img-top show-img" alt="listing_image">
             <div class="card-body">
                 <br>
                 <p class="card-text">
@@ -39,9 +39,9 @@
             </div>
             <%}%>
 
-
+            
+            <div class="col-8 offset-3 mb-2">
             <% if (currUser){%>
-                <div class="col-8 offset-3">
                             <hr>
                             <h4>Leave a Review</h4>
                         <form action="/listings/<%=listing._id%>/reviews" method="post" novalidate
@@ -70,9 +70,9 @@
                             </div>
                             <button class="btn btn-outline-dark" type="submit">Submit</button>
                         </form>
-                        <hr>
                         <%}%>
-
+                        <%if(listing.reviews.length>0){%>
+                            <hr>
                             <p><b>All Reviews</b></p>
                             <div class="row ">
                                 <% for (let review of listing.reviews) { %>
@@ -93,5 +93,6 @@
                                     </div>
                                 <% } %>
                             </div>
+                            <%}%>
                 </div>
     </div>
